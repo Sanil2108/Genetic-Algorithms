@@ -1,47 +1,53 @@
 import random
 
-
 def create_random_arrays(array):
-    N = 10
+    N = 9
     arrays = [[0]] * N
     for i in range(N):
         arrays[i] = create_random_array(array)
     return arrays
 
-
 def create_random_array(array):
-    arr = array[:]
+    arr=array[:]
     n = int(len(arr))
     for i in range(int(n / 2)):
-        a = random.randint(0, n - 1)
-        b = random.randint(0, n - 1)
+        a = random.randint(0, n-1)
+        b = random.randint(0, n-1)
         temp = arr[a]
         arr[a] = arr[b]
         arr[b] = temp
     return arr
 
-
 def fitness(array):
-    fitness = 0
-    for i in range(0, len(array) - 1, 1):
-        if (array[i] < array[i + 1]):
-            fitness += 1
+    fitness=0
+    for i in range(0, len(array)-1, 1):
+        if array[i]<array[i+1]:
+            fitness+=1
     return fitness
 
-
 def genetic_algo(array):
-    # Create a bunch of arrays
-    arrays = create_random_arrays(array)
-    # Find the fitness array
-    fitness_array = [0] * len(arrays)
-    # Combine them together to form a fitness array
+    count=100
+    #Create a bunch of arrays
+    arrays=create_random_arrays(array)
+    #Find the fitness array
+    fitness_array=[0]*len(arrays)
+    #Combine them together to form a fitness array
     for i in range(len(fitness_array)):
-        fitness_array[i] = fitness(arrays[i])
-    arrays_and_fitness = list(zip(arrays, fitness_array))
-    print(arrays_and_fitness)
-    # Sort them
-    sorted_arrays_and_fitness = sort_arrays_based_on_fitness(array, arrays_and_fitness)
-
+        fitness_array[i]=fitness(arrays[i])
+    arrays_and_fitness=list(zip(arrays, fitness_array))
+    for i in range(count):
+        #Sort them
+        sorted_arrays_and_fitness=sort_arrays_based_on_fitness(array, arrays_and_fitness)
+        #Take the top 2/3 of these 
+        n=(2*len(sorted_arrays_and_fitness))/3
+        n=int(n)
+        sorted_arrays_and_fitness=sorted_arrays_and_fitness[0:n]
+        #Create child arrays
+        for i in range(0, n, 2):
+            child=create_child_array(sorted_arrays_and_fitness[i][0], sorted_arrays_and_fitness[i+1][0])
+            child_fitness=fitness(child)
+            sorted_arrays_and_fitness.append((child, child_fitness))
+    return sorted_arrays_and_fitness
 
 def sort_arrays_based_on_fitness(array, arrays_and_fitness):
     max_fitness = len(array) - 1
@@ -57,12 +63,7 @@ def sort_arrays_based_on_fitness(array, arrays_and_fitness):
         for k in range(len(rank_array[i])):
             sorted_arrays_and_fitness[j]=(rank_array[i][k], i)
             j+=1
-        # if rank_array[i] != 0:
-        #     rank_array[i] -= 1
-        #     sort_arrays_based_on_fitness[j] = i
-        #     j += 1
     return sorted_arrays_and_fitness
-
 
 def create_child_array(array1, array2):
     max_element = array1[0]
@@ -85,8 +86,6 @@ def create_child_array(array1, array2):
                 child_rank_array[rank_array[i]] = [i]
             continue
         child_rank_array[rank_array[i]].append(i)
-        # child_rank_array[rank_array[i]] = i
-
     j = 0
     for i in range(len(child_rank_array)):
         if(child_rank_array[i]==-1):
@@ -96,8 +95,4 @@ def create_child_array(array1, array2):
             j += 1
     return child_array
 
-
-# create_random_arrays([1, 2, 3, 4])
-print(create_child_array([1, 2, 3, 4], [2, 3, 4, 1]))
-# create_child_array([1, 3, 4, 2], [1, 4, 2, 3])
-# sort_arrays_based_on_fitness([1, 2, 3, 4], [([1, 2, 3, 4], 3), ([3, 1, 2, 4], 2), ([3, 2, 1, 4], 1), ([3, 2, 1, 4], 1), ([3, 2, 1, 4], 1), ([2, 3, 1, 4], 2), ([2, 3, 1, 4], 2), ([2, 1, 3, 4], 2), ([2, 1, 3, 4], 2), ([1, 3, 2, 4], 2)])
+print(genetic_algo([1,2,3,4]))
